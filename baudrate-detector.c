@@ -6,6 +6,10 @@ Baud rate is measured by looking for level changes on int0 pin and
 measuring the time between the shortest level change. That is our 
 bit time and thus our bit rate. 
 
+Connect using usb to TTL serial: 
+- "picocom -b 38400 /dev/ttyUSB0"
+
+Example board using ATMega88 running at 18.432Mhz.
 */
 
 #define F_CPU 18432000UL
@@ -49,7 +53,7 @@ ISR(INT0_vect){
 	bd_state_changed();
 }
 
-#define BAUD_RATE 9600
+#define BAUD_RATE 38400
 #define BAUD_PRESCALE (F_CPU/(BAUD_RATE*16L)-1)
 
 
@@ -94,7 +98,15 @@ int main(){
 	BIT(D, 2, DDR) = INPUT; 
 	
 	bd_init(&clock_ticks, &poll_pin);
+	
 	while(1){
+		printf("\x1b[H\x1b[2J"); // cursor home, clear screen (vt100)
+		printf("========================================================\r\n");
+		printf("===              BAUD RATE CALCULATOR                ===\r\n");
+		printf("===                 running on AVR                   ===\r\n");
+		printf("===       visit https://github.com/fantachip         ===\r\n");
+		printf("========================================================\r\n");
+		
 		u32 baud = bd_baudrate();
 		//u32 baud = bd_measure(); 
 		printf("Baudrate measured: [%-6ldbps]\r", baud * 2); 
